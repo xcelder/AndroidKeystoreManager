@@ -121,44 +121,109 @@ public class KeystoreManager {
 
     }
 
-    public static String decrypteText(String txt) throws KeystoreManagerException {
-            String decryptedText = "";
+    public static String decryptText(String txt) throws KeystoreManagerException {
+        String decryptedText = "";
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
+            PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+            Cipher output;
             try {
-                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
-                PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-                Cipher output;
-                try {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-                        output = Cipher.getInstance(ALGORITHM_M, PROVIDER_M);
-                    else
-                        output = Cipher.getInstance(ALGORITHM, PROVIDER);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
+                    output = Cipher.getInstance(ALGORITHM_M, PROVIDER_M);
+                else
+                    output = Cipher.getInstance(ALGORITHM, PROVIDER);
 //}
-                    output.init(Cipher.DECRYPT_MODE, privateKey);
-                    CipherInputStream cipherInputStream = new CipherInputStream(
-                            new ByteArrayInputStream(Base64.decode(txt, Base64.DEFAULT)), output);
-                    ArrayList<Byte> values = new ArrayList<>();
-                    int nextByte;
-                    while ((nextByte = cipherInputStream.read()) != -1) {
-                        values.add((byte) nextByte);
-                    }
-                    byte[] bytes = new byte[values.size()];
-                    for (int i = 0; i < bytes.length; i++) {
-                        bytes[i] = values.get(i);
-                    }
-
-                    decryptedText = new String(bytes, 0, bytes.length, "UTF-8");
-                    return decryptedText;
-                } catch (NoSuchAlgorithmException | NoSuchPaddingException | IOException | NoSuchProviderException | InvalidKeyException e) {
-                    throw new KeystoreManagerException(e.getMessage());
+                output.init(Cipher.DECRYPT_MODE, privateKey);
+                CipherInputStream cipherInputStream = new CipherInputStream(
+                        new ByteArrayInputStream(Base64.decode(txt, Base64.DEFAULT)), output);
+                ArrayList<Byte> values = new ArrayList<>();
+                int nextByte;
+                while ((nextByte = cipherInputStream.read()) != -1) {
+                    values.add((byte) nextByte);
                 }
-            } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+                byte[] bytes = new byte[values.size()];
+                for (int i = 0; i < bytes.length; i++) {
+                    bytes[i] = values.get(i);
+                }
+
+                decryptedText = new String(bytes, 0, bytes.length, "UTF-8");
+                return decryptedText;
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | IOException | NoSuchProviderException | InvalidKeyException e) {
                 throw new KeystoreManagerException(e.getMessage());
             }
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+            throw new KeystoreManagerException(e.getMessage());
+        }
 
 
     }
 
-    public static KeyStore getKeyStore(){
+    public static byte[] encryptBytes(byte[] bytes) throws KeystoreManagerException {
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
+            PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
+
+            // Encrypt the text
+            if (bytes.length <= 0) {
+                throw new KeystoreManagerException(KeystoreManagerException.EXCEPTION_EMPTY_TEXT);
+            }
+            Cipher input;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
+                input = Cipher.getInstance(ALGORITHM_M, PROVIDER_M);
+            else
+                input = Cipher.getInstance(ALGORITHM, PROVIDER);
+
+            input.init(Cipher.ENCRYPT_MODE, publicKey);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, input);
+            cipherOutputStream.write(bytes);
+            cipherOutputStream.close();
+
+            return outputStream.toByteArray();
+
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
+                | UnrecoverableEntryException | NoSuchPaddingException
+                | NoSuchProviderException | KeystoreManagerException | KeyStoreException e) {
+            throw new KeystoreManagerException("Exception " + e.getMessage() + " occured");
+        }
+    }
+
+    public static byte[] decryptBytes(byte[] bytes) throws KeystoreManagerException {
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
+            PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+            Cipher output;
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
+                    output = Cipher.getInstance(ALGORITHM_M, PROVIDER_M);
+                else
+                    output = Cipher.getInstance(ALGORITHM, PROVIDER);
+//}
+                output.init(Cipher.DECRYPT_MODE, privateKey);
+                CipherInputStream cipherInputStream = new CipherInputStream(
+                        new ByteArrayInputStream(bytes), output);
+                ArrayList<Byte> values = new ArrayList<>();
+                int nextByte;
+                while ((nextByte = cipherInputStream.read()) != -1) {
+                    values.add((byte) nextByte);
+                }
+                byte[] result = new byte[values.size()];
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = values.get(i);
+                }
+
+                return result;
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | IOException | NoSuchProviderException | InvalidKeyException e) {
+                throw new KeystoreManagerException(e.getMessage());
+            }
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+            throw new KeystoreManagerException(e.getMessage());
+        }
+    }
+
+
+    public static KeyStore getKeyStore() {
         return keyStore;
     }
 
