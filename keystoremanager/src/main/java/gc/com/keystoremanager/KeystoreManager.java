@@ -87,6 +87,13 @@ public class KeystoreManager {
         }
     }
 
+    /**
+     * Method for encrypt a text with your own Android KeyStore
+     *
+     * @param txt The text you want to encrypt
+     * @return String with your text finally encrypted
+     * @throws KeystoreManagerException
+     */
     public String encryptText(String txt) throws KeystoreManagerException {
         String encryptedText = "";
         try {
@@ -121,6 +128,13 @@ public class KeystoreManager {
 
     }
 
+    /**
+     * Method for decrypt a text with your own Android KeyStore
+     *
+     * @param txt The text you want to decrypt
+     * @return String with your text finally decrypted
+     * @throws KeystoreManagerException
+     */
     public String decryptText(String txt) throws KeystoreManagerException {
         String decryptedText = "";
         try {
@@ -157,6 +171,13 @@ public class KeystoreManager {
 
     }
 
+    /**
+     * Method for encrypt a byte array with your own Android KeyStore
+     *
+     * @param bytes The byte array you want to encrypt
+     * @return Byte array with your bytes finally encrypted
+     * @throws KeystoreManagerException
+     */
     public byte[] encryptBytes(byte[] bytes) throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
@@ -188,6 +209,13 @@ public class KeystoreManager {
         }
     }
 
+    /**
+     * Method for decrypt a byte array with your own Android KeyStore
+     *
+     * @param bytes The byte array you want to decrypt
+     * @return Byte array with your bytes finally decrypted
+     * @throws KeystoreManagerException
+     */
     public byte[] decryptBytes(byte[] bytes) throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
@@ -221,11 +249,17 @@ public class KeystoreManager {
         }
     }
 
-
+    /**
+     * @return Your KeyStore instance with the Alias you defined
+     */
     public KeyStore getKeyStore() {
         return keyStore;
     }
 
+    /**
+     * @return A KeyPair with the asymmetric pair of public and private keys
+     * @throws KeystoreManagerException
+     */
     public KeyPair getKeyPair() throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
