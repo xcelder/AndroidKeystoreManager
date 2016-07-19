@@ -1,1 +1,1 @@
-include ':appDemo', ':keystoremanager'
+include ':appDemo', ':keystoremanager', ':encrypttextoperation'

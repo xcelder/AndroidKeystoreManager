@@ -1,12 +1,12 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.ele.buttercookie'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "gc.com.androidkeystoremanager"
         minSdkVersion 18
         targetSdkVersion 23
         versionCode 1
@@ -20,13 +20,21 @@ android {
     }
 }
 
-
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'me.ele:buttercookie-plugin:1.1.0'
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
+    compile project(':keystoremanager')
+    compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.jakewharton:butterknife:8.1.0'
     apt 'com.jakewharton:butterknife-compiler:8.1.0'
-    compile project(':encrypttextoperation')
 }

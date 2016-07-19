@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">EncryptTextOperation</string>
+    <string name="btn_encrypt">Encrypt</string>
+    <string name="btn_decrypt">Decrypt</string>
+</resources>

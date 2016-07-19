@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AndroidKeystoreManager</string>
+    <string name="btn_text">Encrypt Text</string>
+    <string name="btn_bytes">Encrypt bytes</string>
 </resources>

@@ -35,9 +35,9 @@ import javax.security.auth.x500.X500Principal;
  */
 public class KeystoreManager {
 
-    static KeyStore keyStore;
-    static KeyPair keyPair;
-    static final String ALIAS = "chorbOSKEY";
+    KeyStore keyStore;
+    KeyPair keyPair;
+    static final String ALIAS = "YOUR_ALIAS"; //Enter your alias here (only a name for the key pair instance)
     static final String KEY_ALGORITHM_RSA = "RSA";
     static final String KEYSTORE_NAME = "AndroidKeyStore";
     private static final String ALGORITHM = "RSA/ECB/PKCS1Padding";
@@ -87,7 +87,7 @@ public class KeystoreManager {
         }
     }
 
-    public static String encryptText(String txt) throws KeystoreManagerException {
+    public String encryptText(String txt) throws KeystoreManagerException {
         String encryptedText = "";
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
@@ -121,7 +121,7 @@ public class KeystoreManager {
 
     }
 
-    public static String decryptText(String txt) throws KeystoreManagerException {
+    public String decryptText(String txt) throws KeystoreManagerException {
         String decryptedText = "";
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
@@ -132,7 +132,6 @@ public class KeystoreManager {
                     output = Cipher.getInstance(ALGORITHM_M, PROVIDER_M);
                 else
                     output = Cipher.getInstance(ALGORITHM, PROVIDER);
-//}
                 output.init(Cipher.DECRYPT_MODE, privateKey);
                 CipherInputStream cipherInputStream = new CipherInputStream(
                         new ByteArrayInputStream(Base64.decode(txt, Base64.DEFAULT)), output);
@@ -158,7 +157,7 @@ public class KeystoreManager {
 
     }
 
-    public static byte[] encryptBytes(byte[] bytes) throws KeystoreManagerException {
+    public byte[] encryptBytes(byte[] bytes) throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
             PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
@@ -189,7 +188,7 @@ public class KeystoreManager {
         }
     }
 
-    public static byte[] decryptBytes(byte[] bytes) throws KeystoreManagerException {
+    public byte[] decryptBytes(byte[] bytes) throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
             PrivateKey privateKey = privateKeyEntry.getPrivateKey();
@@ -223,11 +222,11 @@ public class KeystoreManager {
     }
 
 
-    public static KeyStore getKeyStore() {
+    public KeyStore getKeyStore() {
         return keyStore;
     }
 
-    public static KeyPair getKeyPair() throws KeystoreManagerException {
+    public KeyPair getKeyPair() throws KeystoreManagerException {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
             return new KeyPair(privateKeyEntry.getCertificate().getPublicKey(), privateKeyEntry.getPrivateKey());
