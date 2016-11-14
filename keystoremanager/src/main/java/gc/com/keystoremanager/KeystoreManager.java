@@ -1,6 +1,7 @@
 package gc.com.keystoremanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -45,7 +46,51 @@ public class KeystoreManager {
     private static final String PROVIDER = "AndroidOpenSSL";
     private static final String PROVIDER_M = "AndroidKeyStoreBCWorkaround";
 
+    private static KeystoreManager instance;
+    private final SharedPreferences sharedPreferences;
+
+    public static void init(Context context){
+        try {
+            instance = new KeystoreManager(context);
+        } catch (KeystoreManagerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static KeystoreManager getInstance(){
+        return instance;
+    }
+
+    public String getPreference(String key){
+        try {
+            key = encryptText(key);
+
+        String value = this.sharedPreferences.getString(key, "");
+        if("".equals(value)) return value;
+        else return decryptText(value);
+        } catch (KeystoreManagerException e) {
+            return "";
+        }
+    }
+
+    public void setPreference(String key, String value){
+        try {
+            value = encryptText(value);
+            key = encryptText(key);
+            this.sharedPreferences.edit().putString(key, value).commit();
+        } catch (KeystoreManagerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removePreferences(){
+        this.sharedPreferences.edit().clear().commit();
+    }
+
     public KeystoreManager(Context context) throws KeystoreManagerException {
+
+        sharedPreferences = context.getSharedPreferences("KeyStore", 0);
+
         try {
             keyStore = KeyStore.getInstance(KEYSTORE_NAME);
             keyStore.load(null);
